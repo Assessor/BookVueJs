@@ -12,7 +12,12 @@
     
 <div id="app">
     <header>
-        <h1>{{ sitename }}</h1>
+        <div class="navbar navbar-default">
+            <h1>{{ sitename }}</h1>
+        </div>
+        <div class="nav navbar-nav navbar-right cart">
+            <span class="glyphicon glyphicon-shoping-cart">{{ cartItemCount }}</span>
+        </div>
     </header>
 
     <main>
@@ -26,6 +31,7 @@
                 <h1 v-text="product.title"></h1>
                 <p v-html="product.description"></p>
                 <p class="price">{{ product.price | formatPrice }}</p>
+                <button class="default" v-on:click="addToCart" v-show="canAddToCart">Add to cart</button>
             </div>
         </div>
     </main>
@@ -33,6 +39,8 @@
 
 <script type="text/javascript">
     var APP_LOG_LIFECYCLE_EVENTS = true;
+
+
 
     var webstore = new Vue({
         el: '#app',
@@ -43,8 +51,10 @@
                 title: 'Cat Food, 21lb bag',
                 description: 'A 25 pound bag of organic <em>goodnes</em> for your cat.',
                 price: 200000,
-                image: 'https://d12swbtw719y4s.cloudfront.net/images/jJ24FEUi/XuzFWz5GgLMhhdBIsdsK/AonYMOV.jpeg?w=620'
-            }
+                image: 'https://d12swbtw719y4s.cloudfront.net/images/jJ24FEUi/XuzFWz5GgLMhhdBIsdsK/AonYMOV.jpeg?w=620',
+                availableInventory: 5
+            },
+            cart: []
         },
         filters: {
             formatPrice: function(price) {
@@ -66,6 +76,19 @@
                 } else {
                     return '$' + (price / 100).toFixed(2);
                 }
+            }
+        },
+        methods: {
+            addToCart: function() {
+                this.cart.push(this.product.id);
+            }
+        },
+        computed: {
+            cartItemCount: function() {
+                return this.cart.length || 0;
+            },
+            canAddToCart: function() {
+                return this.product.availableInventory > this.cartItemCount;
             }
         },
         beforeCreate: function() {
